@@ -363,8 +363,51 @@ display: none;
 </div>
 
 
-<div id="r-markdown" class="section level2">
-<h2>R Markdown</h2>
+<div id="day-03-rucksack-reorganization" class="section level1">
+<h1><a href="https://adventofcode.com/2022/day/3">Day 03: Rucksack
+Reorganization</a></h1>
+<div id="part-a" class="section level2">
+<h2>Part A</h2>
+<p>One Elf has the important job of loading all of the rucksacks with
+supplies for the jungle journey. Unfortunately, that Elf didn’t quite
+follow the packing instructions, and so a few items now need to be
+rearranged.</p>
+<p>Each rucksack has two large compartments. All items of a given type
+are meant to go into exactly one of the two compartments. The Elf that
+did the packing failed to follow this rule for exactly one item type per
+rucksack.</p>
+<p>The Elves have made a list of all of the items currently in each
+rucksack (your puzzle input), but they need your help finding the
+errors. Every item type is identified by a single lowercase or uppercase
+letter (that is, a and A refer to different types of items).</p>
+<p>The list of items for each rucksack is given as characters all on a
+single line. A given rucksack always has the same number of items in
+each of its two compartments, so the first half of the characters
+represent items in the first compartment, while the second half of the
+characters represent items in the second compartment.</p>
+<p>For example, suppose you have the following list of contents from six
+rucksacks:</p>
+<p>vJrwpWtwJgWrhcsFMMfFFhFp jqHRNqRjqzjGDLGLrsFMfFZSrLrFZsSL
+PmmdzqPrVvPwwTWBwg wMqvLMZHhHMvwLHjbvcjnnSBnvTQFn ttgJtRGJQctTZtZT
+CrZsJsPPZsGzwwsLwLmpwMDw The first rucksack contains the items
+vJrwpWtwJgWrhcsFMMfFFhFp, which means its first compartment contains the
+items vJrwpWtwJgWr, while the second compartment contains the items
+hcsFMMfFFhFp. The only item type that appears in both compartments is
+lowercase p. The second rucksack’s compartments contain jqHRNqRjqzjGDLGL
+and rsFMfFZSrLrFZsSL. The only item type that appears in both
+compartments is uppercase L. The third rucksack’s compartments contain
+PmmdzqPrV and vPwwTWBwg; the only common item type is uppercase P. The
+fourth rucksack’s compartments only share item type v. The fifth
+rucksack’s compartments only share item type t. The sixth rucksack’s
+compartments only share item type s. To help prioritize item
+rearrangement, every item type can be converted to a priority:</p>
+<p>Lowercase item types a through z have priorities 1 through 26.
+Uppercase item types A through Z have priorities 27 through 52. In the
+above example, the priority of the item type that appears in both
+compartments of each rucksack is 16 (p), 38 (L), 42 (P), 22 (v), 20 (t),
+and 19 (s); the sum of these is 157.</p>
+<p>Find the item type that appears in both compartments of each
+rucksack. What is the sum of the priorities of those item types?</p>
 <pre class="r"><code>find_duplicate &lt;- function(strA,strB){
     str_detect(strA,c(letters,LETTERS))+
         str_detect(strB,c(letters,LETTERS))-&gt; C
@@ -385,6 +428,7 @@ d3_input &lt;- data.frame(str = readLines(here(&quot;input&quot;,&quot;d03_input
 
 sum(priorities$priority)</code></pre>
 <pre><code>## [1] 8349</code></pre>
+</div>
 </div>
 <div id="b" class="section level1">
 <h1>B</h1>
@@ -419,6 +463,8 @@ sticker attachment efforts: here, they are 18 (r) for the first group
 and 52 (Z) for the second group. The sum of these is 70.</p>
 <p>Find the item type that corresponds to the badges of each three-Elf
 group. What is the sum of the priorities of those item types?</p>
+<div id="option-1." class="section level3">
+<h3>option 1.</h3>
 <pre class="r"><code>elves_group &lt;- d3_input %&gt;% 
     mutate(id = row_number()) %&gt;%
     mutate(group = ceiling(id/3)) %&gt;%
@@ -442,149 +488,45 @@ elves_group %&gt;%
 ##       n
 ##   &lt;int&gt;
 ## 1  2681</code></pre>
-<pre class="r"><code>elves_group &lt;- d3_input %&gt;% 
-    mutate(id = row_number()) %&gt;%
-    mutate(group = ceiling(id/3)) %&gt;%
-    mutate(elf_in_group = id%%3 + 1) %&gt;% 
-    select(-id) 
-
-find_badge &lt;- function(str){
+</div>
+<div id="option-2" class="section level3">
+<h3>option 2</h3>
+<p>substituting the manual sum by reduce.</p>
+<pre class="r"><code>find_badge &lt;- function(str){
     map(str, function(x)
-        str_detect(x,c(letters,LETTERS))) %&gt;%
-    as_tibble(.name_repair = &quot;unique&quot;) %&gt;%
-    mutate(t = rowSums(.)) %&gt;%
-    pull(t) %&gt;%
-    which.max()
-}
-
-elves_group %&gt;%
-    group_by(group) %&gt;% 
-    summarise(max = find_badge(str)) %&gt;%
-    pull(max) %&gt;%
-    sum() </code></pre>
-<pre><code>## New names:
-## New names:
-## New names:
-## New names:
-## New names:
-## New names:
-## New names:
-## New names:
-## New names:
-## New names:
-## New names:
-## New names:
-## New names:
-## New names:
-## New names:
-## New names:
-## New names:
-## New names:
-## New names:
-## New names:
-## New names:
-## New names:
-## New names:
-## New names:
-## New names:
-## New names:
-## New names:
-## New names:
-## New names:
-## New names:
-## New names:
-## New names:
-## New names:
-## New names:
-## New names:
-## New names:
-## New names:
-## New names:
-## New names:
-## New names:
-## New names:
-## New names:
-## New names:
-## New names:
-## New names:
-## New names:
-## New names:
-## New names:
-## New names:
-## New names:
-## New names:
-## New names:
-## New names:
-## New names:
-## New names:
-## New names:
-## New names:
-## New names:
-## New names:
-## New names:
-## New names:
-## New names:
-## New names:
-## New names:
-## New names:
-## New names:
-## New names:
-## New names:
-## New names:
-## New names:
-## New names:
-## New names:
-## New names:
-## New names:
-## New names:
-## New names:
-## New names:
-## New names:
-## New names:
-## New names:
-## New names:
-## New names:
-## New names:
-## New names:
-## New names:
-## New names:
-## New names:
-## New names:
-## New names:
-## New names:
-## New names:
-## New names:
-## New names:
-## New names:
-## New names:
-## New names:
-## New names:
-## New names:
-## New names:
-## New names:
-## • `` -&gt; `...1`
-## • `` -&gt; `...2`
-## • `` -&gt; `...3`</code></pre>
-<pre><code>## [1] 2681</code></pre>
-<pre class="r"><code>elves_group &lt;- d3_input %&gt;% 
-    mutate(id = row_number()) %&gt;%
-    mutate(group = ceiling(id/3)) %&gt;%
-    mutate(elf_in_group = id%%3 + 1) %&gt;% 
-    select(-id) 
-
-find_badge &lt;- function(str){
-map(str, function(x)
-    str_detect(x,c(letters,LETTERS)))%&gt;% 
+            str_detect(x,c(letters,LETTERS))
+        )%&gt;% 
     reduce(.,`+`) %&gt;%
         which.max()
 }
 
-elves_group %&gt;%
+d3_input %&gt;% 
+    mutate(group = ceiling(row_number()/3)) %&gt;%
     group_by(group) %&gt;% 
     summarise(max = find_badge(str)) %&gt;%
     pull(max) %&gt;%
     sum() </code></pre>
 <pre><code>## [1] 2681</code></pre>
+</div>
+<div id="option-3" class="section level3">
+<h3>option 3:</h3>
+<p>reduce -&gt; pmap.</p>
+<pre class="r"><code>find_badge &lt;- function(str){
+    map(str, function(x)
+            str_detect(x,c(letters,LETTERS))
+        ) %&gt;% 
+    pmap(.,sum) %&gt;% 
+        which.max()
+}
+
+d3_input %&gt;% 
+    mutate(group = ceiling(row_number()/3)) %&gt;%
+    group_by(group) %&gt;% 
+    summarise(max = find_badge(str)) %&gt;%
+    pull(max) %&gt;%
+    sum() </code></pre>
+<pre><code>## [1] 2681</code></pre>
+</div>
 </div>
 
 
