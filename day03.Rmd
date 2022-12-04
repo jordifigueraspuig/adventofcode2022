@@ -1,0 +1,99 @@
+---
+title: "Day 03"
+author: "JFigueras"
+date: "2022-12-03"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(here)
+library(stringr)
+library(tidyverse)
+```
+
+## R Markdown
+
+```{r}
+find_duplicate <- function(strA,strB){
+    str_detect(strA,c(letters,LETTERS))+
+        str_detect(strB,c(letters,LETTERS))-> C
+    which.max(C)
+}
+
+#find_duplicate(strA,strB)
+
+d3_input <- data.frame(str = readLines(here("input","d03_input.txt"))) 
+
+priorities <- d3_input %>%
+    mutate(L = str_length(str)) %>% 
+    mutate(strA = str_sub(str,1,L/2),
+           strB = str_sub(str,L/2+1,L)) |> 
+    rowwise() |> 
+    mutate(priority = find_duplicate(strA,strB))
+
+sum(priorities$priority)
+```
+
+# B
+
+As you finish identifying the misplaced items, the Elves come to you with another issue.
+
+For safety, the Elves are divided into groups of three. Every Elf carries a badge that identifies their group. For efficiency, within each group of three Elves, the badge is the only item type carried by all three Elves. That is, if a group's badge is item type B, then all three Elves will have item type B somewhere in their rucksack, and at most two of the Elves will be carrying any other item type.
+
+The problem is that someone forgot to put this year's updated authenticity sticker on the badges. All of the badges need to be pulled out of the rucksacks so the new authenticity stickers can be attached.
+
+Additionally, nobody wrote down which item type corresponds to each group's badges. The only way to tell which item type is the right one is by finding the one item type that is common between all three Elves in each group.
+
+Every set of three lines in your list corresponds to a single group, but each group can have a different badge item type. So, in the above example, the first group's rucksacks are the first three lines:
+
+vJrwpWtwJgWrhcsFMMfFFhFp jqHRNqRjqzjGDLGLrsFMfFZSrLrFZsSL PmmdzqPrVvPwwTWBwg And the second group's rucksacks are the next three lines:
+
+wMqvLMZHhHMvwLHjbvcjnnSBnvTQFn ttgJtRGJQctTZtZT CrZsJsPPZsGzwwsLwLmpwMDw In the first group, the only item type that appears in all three rucksacks is lowercase r; this must be their badges. In the second group, their badge item type must be Z.
+
+Priorities for these items must still be found to organize the sticker attachment efforts: here, they are 18 (r) for the first group and 52 (Z) for the second group. The sum of these is 70.
+
+Find the item type that corresponds to the badges of each three-Elf group. What is the sum of the priorities of those item types?
+
+```{r}
+elves_group <- d3_input %>% 
+    mutate(id = row_number()) %>%
+    mutate(group = ceiling(id/3)) %>%
+    mutate(elf_in_group = id %%3 + 1) %>% 
+    select(-id) %>% 
+    pivot_wider(names_from = "elf_in_group",values_from = "str",names_prefix = "str")
+
+find_badge <- function(str1,str2,str3){
+    C <- str_detect(str1,c(letters,LETTERS))+
+    str_detect(str2,c(letters,LETTERS))+ 
+    str_detect(str3,c(letters,LETTERS))
+    which.max(C)
+}
+
+elves_group %>%
+    rowwise() %>%
+    mutate(pr = find_badge(str1,str2,str3)) %>% 
+    ungroup() %>% 
+    count(wt=pr)
+```
+
+
+```{r}
+
+find_badge <- function(str){
+    map(str, function(x)
+            str_detect(x,c(letters,LETTERS))
+        )%>% 
+    reduce(.,`+`) %>%
+        which.max()
+}
+
+d3_input %>% 
+    mutate(group = ceiling(row_number()/3)) %>%
+    group_by(group) %>% 
+    summarise(max = find_badge(str)) %>%
+    pull(max) %>%
+    sum() 
+```
+
+
